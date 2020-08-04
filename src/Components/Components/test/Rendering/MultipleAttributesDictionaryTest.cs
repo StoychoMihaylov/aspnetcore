@@ -31,6 +31,25 @@ namespace Microsoft.AspNetCore.Components.Rendering
         }
 
         [Fact]
+        public void HandlesKeysThatVaryOnlyByOneChar()
+        {
+            // Arrange
+            // This test case is intended to produce clashing hashes
+            var instance = new MultipleAttributesDictionary();
+            instance.TryAdd("SomeLongKey", 123, out _);
+
+            // Act
+            var didAddSecondEntry = instance.TryAdd("SXmeLongKey", 456, out _);
+
+            // Assert
+            Assert.True(didAddSecondEntry);
+            Assert.False(instance.TryAdd("SomeLongKey", 0, out var existingValue1));
+            Assert.False(instance.TryAdd("SXmeLongKey", 0, out var existingValue2));
+            Assert.Equal(123, existingValue1);
+            Assert.Equal(456, existingValue2);
+        }
+
+        [Fact]
         public void CanClear()
         {
             // Arrange
